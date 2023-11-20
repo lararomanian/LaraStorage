@@ -205,7 +205,12 @@ class FileController extends Controller
                 $this->saveFileTree($file, $folder, $user);
             } else {
 
-                $this->saveFile($file, $user, $parent);
+                $uploadedFile = $this->saveFile($file, $user, $parent);
+                // Post the file to the OCR API endpoint
+                $ocrText = $this->postToOcrApi($uploadedFile);
+
+                // Update the File model with the OCR text
+                $uploadedFile->update(['ocr_text' => $ocrText]);
             }
         }
     }
@@ -266,7 +271,6 @@ class FileController extends Controller
      * @param $file
      * @param $user
      * @param $parent
-     * @author Zura Sekhniashvili <zurasekhniashvili@gmail.com>
      */
     private function saveFile($file, $user, $parent)
     {
@@ -543,7 +547,7 @@ class FileController extends Controller
     private function postToOcrApi($file)
     {
         $path = $file->storage_path;
-        $ocrApiEndpoint = 'http://192.168.101.4:8000/api/documents/store';
+        $ocrApiEndpoint = 'http://192.168.101.8:8000/api/documents/store';
 
         $response = Http::timeout(6000000)->post($ocrApiEndpoint, [
             'lang' => 'eng+nep',
@@ -553,5 +557,16 @@ class FileController extends Controller
         $ocrText = $response->json('data');
 
         return $ocrText;
+    }
+
+    public function updateOCR(Request $request)
+    {
+        $data = $request->all();
+
+        $file = File::find($data['id']);
+
+        $file->update(['ocr_text' => $data['ocr_text']]);
+
+        return redirect()->back();
     }
 }

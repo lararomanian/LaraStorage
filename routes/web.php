@@ -44,12 +44,17 @@ Route::controller(\App\Http\Controllers\FileController::class)
         Route::get('/file/download', 'download')->name('file.download');
         Route::get('/file/download-shared-with-me', 'downloadSharedWithMe')->name('file.downloadSharedWithMe');
         Route::get('/file/download-shared-by-me', 'downloadSharedByMe')->name('file.downloadSharedByMe');
+        Route::post('/file/update-ocr','updateOCR')->name('file.updateOCR');
     });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::get('/test', function(){
+    return env('ENGINE_URL') . '/documents/store';
 });
 
 require __DIR__ . '/auth.php';

@@ -19,14 +19,16 @@
                     <th class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
                         Path
                     </th>
+                    <th class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                        Actions
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="file of allFiles.data" :key="file.id"
-                    @click="$event => toggleFileSelect(file) "
                     class="border-b transition duration-300 ease-in-out hover:bg-blue-100 cursor-pointer"
                     :class="(selected[file.id] || allSelected ) ? 'bg-blue-50' : 'bg-white'">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[30px] max-w-[30px] pr-0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[30px] max-w-[30px] pr-0" @click="$event => toggleFileSelect(file) ">
                         <Checkbox @change="$event => onSelectCheckboxChange(file)" v-model="selected[file.id]"
                                   :checked="selected[file.id] || allSelected"/>
                     </td>
@@ -36,6 +38,9 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {{ file.path }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <EditFilesButton v-if="!file.is_folder" :file="file" :all-selected="allSelected" :selected-ids="selectedIds" />
                     </td>
                 </tr>
                 </tbody>
@@ -63,6 +68,7 @@ import DeleteFilesButton from "@/Components/app/DeleteFilesButton.vue";
 import DownloadFilesButton from "@/Components/app/DownloadFilesButton.vue";
 import RestoreFilesButton from "@/Components/app/RestoreFilesButton.vue";
 import DeleteForeverButton from "@/Components/app/DeleteForeverButton.vue";
+import EditFilesButton from "@/Components/app/EditFilesButton.vue";
 
 // Uses
 

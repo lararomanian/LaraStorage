@@ -65,11 +65,10 @@
                 </thead>
                 <tbody>
                 <tr v-for="file of allFiles.data" :key="file.id"
-                    @click="$event => toggleFileSelect(file) "
                     @dblclick="openFolder(file)"
                     class="border-b transition duration-300 ease-in-out hover:bg-blue-100 cursor-pointer"
                     :class="(selected[file.id] || allSelected ) ? 'bg-blue-50' : 'bg-white'">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[30px] max-w-[30px] pr-0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[30px] max-w-[30px] pr-0" @click="$event => toggleFileSelect(file) ">
                         <Checkbox @change="$event => onSelectCheckboxChange(file)" v-model="selected[file.id]"
                                   :checked="selected[file.id] || allSelected"/>
                     </td>
@@ -107,7 +106,7 @@
                         {{ file.size }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <EditFilesButton v-if="!file.is_folder" :all-selected="allSelected" :selected-ids="selectedIds" />
+                        <EditFilesButton v-if="!file.is_folder" :file="file" :all-selected="allSelected" :selected-ids="selectedIds" />
                     </td>
                 </tr>
                 </tbody>
