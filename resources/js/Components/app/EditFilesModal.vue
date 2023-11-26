@@ -1,30 +1,18 @@
 <template>
-    <modal :show="props.modelValue" @show="onShow" max-width="sm">
+    <modal :show="props.modelValue" @show="onShow" class="custom-modal"
+        :class="{ 'sm:max-w-2xl sm:mx-auto sm:w-full': !customStyles }">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900">
                 Edit File
             </h2>
             <div class="mt-6">
-                <InputLabel for="ocr_text" value="OCR TExt" class="sr-only"/>
-
-                <TextInput type="text"
-                           ref="ocrInput"
-                           id="ocr_text"
-                           v-model="form.ocr_text"
-                           :class="form.errors.ocr_text ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''"
-                           class="mt-1 block w-full"
-                           placeholder="Edit OCR Text"
-                           @keyup.enter="share"
-                />
-
-                <InputError :message="form.errors.ocr_text" class="mt-2"/>
-                <Ckeditor v-model="form.ocr_text" :editor="editor" :config="editorConfig"/>
+                <InputError :message="form.errors.ocr_text" class="mt-2" />
+                <ckeditor :editor="editor" v-model="form.ocr_text"></ckeditor>
             </div>
             <div class="mt-6 flex justify-end">
                 <SecondaryButton @click="closeModal">Cancel</SecondaryButton>
-                <PrimaryButton class="ml-3"
-                               :class="{ 'opacity-25': form.processing }"
-                               @click="share" :disable="form.processing">
+                <PrimaryButton class="ml-3" :class="{ 'opacity-25': form.processing }" @click="share"
+                    :disable="form.processing">
                     Save
                 </PrimaryButton>
             </div>
@@ -39,13 +27,13 @@ import TextInput from "@/Components/TextInput.vue";
 import TextArea from "@/Components/Textarea.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {useForm, usePage} from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {nextTick, ref} from "vue";
-import {showSuccessNotification} from "@/event-bus.js";
-import ClassicEditor  from '@ckeditor/ckeditor5-vue';
-import Ckeditor from "@ckeditor/ckeditor5-vue";
+import { nextTick, ref } from "vue";
+import { showSuccessNotification } from "@/event-bus.js";
+import CKEditor from '@ckeditor/ckeditor5-vue';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // Uses
 const form = useForm({
     ocr_text: null,
@@ -54,44 +42,12 @@ const form = useForm({
     parent_id: null
 })
 const page = usePage();
+const customStyles = false;
 
+const editor = ref(ClassicEditor);
 // Refs
 const ocrInput = ref(null)
 
-const editorConfig = {
-    toolbar: {
-        items: [
-            'heading',
-            '|',
-            'bold',
-            'italic',
-            'link',
-            'bulletedList',
-            'numberedList',
-            '|',
-            'outdent',
-            'indent',
-            '|',
-            'blockQuote',
-            'insertTable',
-            'mediaEmbed',
-            'undo',
-            'redo'
-        ]
-    },
-    language: 'en',
-    table: {
-        contentToolbar: [
-            'tableColumn',
-            'tableRow',
-            'mergeTableCells'
-        ]
-    },
-    licenseKey: '',
-    placeholder: 'Type the content here!'
-};
-
-const editor = ClassicEditor;
 // Props & Emit
 const props = defineProps({
     modelValue: Boolean,
@@ -134,8 +90,16 @@ function closeModal() {
 }
 
 // Hooks
+
 </script>
 
 <style scoped>
+.custom-modal {
+    /* Custom styles for the modal */
+    width: 80%;
+    /* Set your desired width */
+    margin: 20px auto;
+    /* Adjust margins as needed */
 
+}
 </style>

@@ -547,7 +547,7 @@ class FileController extends Controller
     private function postToOcrApi($file)
     {
         $path = $file->storage_path;
-        $ocrApiEndpoint = 'http://192.168.101.8:8000/api/documents/store';
+        $ocrApiEndpoint = 'http://192.168.101.7/api/documents/store';
 
         $response = Http::timeout(6000000)->post($ocrApiEndpoint, [
             'lang' => 'eng+nep',
