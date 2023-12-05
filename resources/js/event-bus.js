@@ -16,3 +16,8 @@ export function showSuccessNotification(message) {
 export function showErrorNotification(message) {
     emitter.emit(SHOW_NOTIFICATION, {type: 'error', message})
 }
+
+export function refreshOcrText() {
+    emitter.emit('refreshOcrText')
+}
+

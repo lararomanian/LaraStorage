@@ -243,6 +243,14 @@ function showOnlyFavourites() {
     router.get(window.location.pathname+'?'+params.toString())
 }
 
+emitter.on('refreshOcrText', () => {
+    httpGet(route('myFiles', {folder: props.folder.path}))
+        .then(res => {
+            allFiles.value.data = res.data
+            allFiles.value.next = res.links.next
+        })
+})
+
 // Hooks
 onUpdated(() => {
     allFiles.value = {

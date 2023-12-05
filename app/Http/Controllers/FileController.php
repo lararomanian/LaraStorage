@@ -27,6 +27,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
 
+
 class FileController extends Controller
 {
     public function myFiles(Request $request, string $folder = null)
@@ -547,7 +548,7 @@ class FileController extends Controller
     private function postToOcrApi($file)
     {
         $path = $file->storage_path;
-        $ocrApiEndpoint = 'http://192.168.101.7/api/documents/store';
+        $ocrApiEndpoint = 'http://192.168.101.5:8000/api/documents/store';
 
         $response = Http::timeout(6000000)->post($ocrApiEndpoint, [
             'lang' => 'eng+nep',
@@ -568,5 +569,43 @@ class FileController extends Controller
         $file->update(['ocr_text' => $data['ocr_text']]);
 
         return redirect()->back();
+
+    }
+
+    public function exportPDF(Request $request)
+    {
+        try {
+            $data = $request->ids;
+            $ocr_text_array = [];
+
+            foreach ($data as $id) {
+                $file = File::find($id);
+                array_push($ocr_text_array, $file->ocr_text);
+            }
+
+            $exportApiEndpoint = 'http://192.168.101.5:8000/api/ocr/export-pdf';
+
+            // Make HTTP request to the target Laravel application
+            $response = Http::timeout(60)->post($exportApiEndpoint, [
+                'ocr_text' => $ocr_text_array
+            ]);
+
+            // Ensure a successful response
+            $response->throw();
+
+            return response()->json([
+                'message' => 'Successfully exported pdf',
+                'paths' => $response->json('paths'),
+                'status' => 200
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Log any exceptions
+            \Log::error('Error exporting PDF: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

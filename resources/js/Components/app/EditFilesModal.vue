@@ -1,5 +1,5 @@
 <template>
-    <modal :show="props.modelValue" @show="onShow" class="custom-modal"
+    <EditModal :show="props.modelValue" @show="onShow" class="custom-modal"
         :class="{ 'sm:max-w-2xl sm:mx-auto sm:w-full': !customStyles }">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900">
@@ -7,7 +7,8 @@
             </h2>
             <div class="mt-6">
                 <InputError :message="form.errors.ocr_text" class="mt-2" />
-                <ckeditor :editor="editor" v-model="form.ocr_text"></ckeditor>
+                <!-- Increase the height and apply styles from the input -->
+                <ckeditor :editor="editor" v-model="form.ocr_text" :config="editorConfig" class="border rounded-md p-2"></ckeditor>
             </div>
             <div class="mt-6 flex justify-end">
                 <SecondaryButton @click="closeModal">Cancel</SecondaryButton>
@@ -17,12 +18,13 @@
                 </PrimaryButton>
             </div>
         </div>
-    </modal>
+    </EditModal>
 </template>
 
 <script setup>
 // Imports
 import Modal from "@/Components/Modal.vue";
+import EditModal from "@/Components/EditModal.vue";
 import TextInput from "@/Components/TextInput.vue";
 import TextArea from "@/Components/Textarea.vue";
 import InputError from "@/Components/InputError.vue";
@@ -48,6 +50,29 @@ const editor = ref(ClassicEditor);
 // Refs
 const ocrInput = ref(null)
 
+const editorConfig = {
+    // Customize CKEditor configurations if needed
+    // For example, you can adjust the height of the editor here
+    height: '80vh',
+    width: '90vh',
+    dataProcessor: {
+        // Enable automatic HTML filtering to preserve styles
+        htmlFilter: {
+            add: (data) => {
+                // Preserve all HTML attributes, including styles
+                data.allowedAttributes['*'] = ['*'];
+                return data;
+            },
+        },
+    },
+
+    // Other CKEditor options
+    // You can add more options based on your requirements
+    toolbar: {
+        items: ['heading', '|', 'bold', 'italic', 'underline', 'link', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
+    },
+    language: 'en',
+};
 // Props & Emit
 const props = defineProps({
     modelValue: Boolean,
@@ -67,7 +92,7 @@ function onShow() {
 }
 
 function share() {
-    form.parent_id = page.props.folder.id
+    form.parent_id = props.file.parent_id ?? null
     console.log(props.selectedIds, props.allSelected);
     if (props.allSelected) {
         form.all = true;
@@ -78,6 +103,7 @@ function share() {
             closeModal()
             form.reset();
             showSuccessNotification(`File has been updated successfully`)
+            emit('refreshOcrText')
         },
         onError: () => ocrInput.value.focus()
     })
@@ -87,6 +113,7 @@ function closeModal() {
     emit('update:modelValue')
     form.clearErrors();
     form.reset()
+    onShow()
 }
 
 // Hooks
@@ -95,11 +122,15 @@ function closeModal() {
 
 <style scoped>
 .custom-modal {
-    /* Custom styles for the modal */
     width: 80%;
-    /* Set your desired width */
     margin: 20px auto;
-    /* Adjust margins as needed */
 
+}
+
+.ck-editor__editable {
+    min-height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
 }
 </style>

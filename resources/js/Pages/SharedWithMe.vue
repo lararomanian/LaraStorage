@@ -26,6 +26,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="file of allFiles.data" :key="file.id"
+                @dblclick="openFolder(file)"
                     class="border-b transition duration-300 ease-in-out hover:bg-blue-100 cursor-pointer"
                     :class="(selected[file.id] || allSelected ) ? 'bg-blue-50' : 'bg-white'">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[30px] max-w-[30px] pr-0" @click="$event => toggleFileSelect(file) ">
@@ -40,8 +41,8 @@
                         {{ file.path }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <EditFilesButton v-if="!file.is_folder" :file="file" :all-selected="allSelected" :selected-ids="selectedIds" />
-                    </td>
+        <EditFilesButton v-if="!file.is_folder" :file="file" :all-selected="allSelected" :selected-ids="selectedIds" />
+    </td>
                 </tr>
                 </tbody>
             </table>
@@ -58,8 +59,8 @@
 // Imports
 import {HomeIcon} from '@heroicons/vue/20/solid'
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {router} from "@inertiajs/vue3";
 import {Link} from '@inertiajs/vue3'
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import FileIcon from "@/Components/app/FileIcon.vue";
 import {computed, onMounted, onUpdated, ref} from "vue";
 import {httpGet} from "@/Helper/http-helper.js";
@@ -69,9 +70,12 @@ import DownloadFilesButton from "@/Components/app/DownloadFilesButton.vue";
 import RestoreFilesButton from "@/Components/app/RestoreFilesButton.vue";
 import DeleteForeverButton from "@/Components/app/DeleteForeverButton.vue";
 import EditFilesButton from "@/Components/app/EditFilesButton.vue";
+import {emitter, ON_SEARCH, showSuccessNotification} from "@/event-bus.js";
 
+import ShareFilesButton from "@/Components/app/ShareFilesButton.vue";
+import {all} from "axios";
 // Uses
-
+const page = usePage();
 // Refs
 const allSelected = ref(false);
 const selected = ref({});
@@ -108,6 +112,14 @@ function loadMore() {
         })
 }
 
+function openFolder(file) {
+    if (!file.is_folder) {
+        return;
+    }
+
+    router.visit(route('myFiles', {folder: file.path}))
+}
+
 function onSelectAllChange() {
     allFiles.value.data.forEach(f => {
         selected.value[f.id] = allSelected.value
@@ -141,6 +153,14 @@ function resetForm() {
     allSelected.value = false
     selected.value = {}
 }
+
+emitter.on('refreshOcrText', () => {
+    httpGet(route('myFiles', {folder: props.folder.path}))
+        .then(res => {
+            allFiles.value.data = res.data
+            allFiles.value.next = res.links.next
+        })
+})
 
 // Hooks
 onUpdated(() => {
