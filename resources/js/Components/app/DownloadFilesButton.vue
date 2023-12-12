@@ -90,15 +90,24 @@ function exportPDF() {
         return;
     }
 
+    let file_paths = [];
     let url = route('file.export');
     httpPost(url, {
         ids: props.ids,
     }).then(res => {
             console.log(res);
-            if (!res.url) return;
+            console.log('url', res.urls);
+            file_paths = res.urls;
     }).catch(async (er) => {
+        console.log(er);
             console.log(er.error ? er.error.message : 'An error occurred');
     })
+
+        const a = document.createElement('a');
+        a.download = "exported.pdf";
+        a.href = file_paths[0];
+        a.click();
+        a.remove();
 
     console.log("exported pdfs", props.ids);
 }

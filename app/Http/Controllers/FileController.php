@@ -26,7 +26,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
-
+use Psy\VersionUpdater\Downloader;
+use Psy\VersionUpdater\Downloader\FileDownloader;
 
 class FileController extends Controller
 {
@@ -158,6 +159,11 @@ class FileController extends Controller
         $file->name = $data['name'];
 
         $parent->appendNode($file);
+    }
+
+    public function getLatestEntry(Request $request){
+        $file = File::find($request->id);
+        return $file;
     }
 
     public function store(StoreFileRequest $request)
@@ -575,6 +581,7 @@ class FileController extends Controller
     public function exportPDF(Request $request)
     {
         try {
+
             $data = $request->ids;
             $ocr_text_array = [];
 
@@ -585,26 +592,23 @@ class FileController extends Controller
 
             $exportApiEndpoint = 'http://192.168.101.5:8000/api/ocr/export-pdf';
 
-            // Make HTTP request to the target Laravel application
-            $response = Http::timeout(60)->post($exportApiEndpoint, [
+            $response = Http::timeout(600000)->post($exportApiEndpoint, [
                 'ocr_text' => $ocr_text_array
             ]);
 
-            // Ensure a successful response
-            $response->throw();
+            $filePaths = $response['paths'];
 
-            return response()->json([
-                'message' => 'Successfully exported pdf',
-                'paths' => $response->json('paths'),
-                'status' => 200
-            ], 200);
+            return  [
+                'urls' => $filePaths,
+                'filename' => "pdf_name"
+            ];
 
         } catch (\Exception $e) {
             // Log any exceptions
             \Log::error('Error exporting PDF: ' . $e->getMessage());
 
             return response()->json([
-                'error' => $e->getMessage()
+                'er' => $e->getMessage()
             ], 500);
         }
     }

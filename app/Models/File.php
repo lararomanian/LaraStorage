@@ -25,6 +25,10 @@ class File extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function fileShares()
+    {
+        return $this->hasMany(FileShare::class, 'file_id');
+    }
     public function parent(): BelongsTo
     {
         return $this->belongsTo(File::class, 'parent_id');

@@ -36,6 +36,7 @@ Route::controller(\App\Http\Controllers\FileController::class)
         Route::post('/file', 'store')->name('file.store');
         Route::delete('/file', 'destroy')->name('file.delete');
         Route::post('/file/restore', 'restore')->name('file.restore');
+Route::get('/getLatestEntry/{id}', 'getLatestEntry');
         Route::delete('/file/delete-forever', 'deleteForever')->name('file.deleteForever');
         Route::post('/file/add-to-favourites', 'addToFavourites')->name('file.addToFavourites');
         Route::post('/file/share', 'share')->name('file.share');
