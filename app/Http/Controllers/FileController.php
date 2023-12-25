@@ -554,7 +554,7 @@ class FileController extends Controller
     private function postToOcrApi($file)
     {
         $path = $file->storage_path;
-        $ocrApiEndpoint = 'http://192.168.101.5:8000/api/documents/store';
+        $ocrApiEndpoint = 'http://192.168.137.93:8000/api/documents/store';
 
         $response = Http::timeout(6000000)->post($ocrApiEndpoint, [
             'lang' => 'eng+nep',
@@ -590,7 +590,7 @@ class FileController extends Controller
                 array_push($ocr_text_array, $file->ocr_text);
             }
 
-            $exportApiEndpoint = 'http://192.168.101.5:8000/api/ocr/export-pdf';
+            $exportApiEndpoint = 'http://192.168.137.93:8000/api/ocr/export-pdf';
 
             $response = Http::timeout(600000)->post($exportApiEndpoint, [
                 'ocr_text' => $ocr_text_array
@@ -598,9 +598,27 @@ class FileController extends Controller
 
             $filePaths = $response['paths'];
 
+            $path = $filePaths;
+            // $path = str_replace("\\", "/", $path);
+
+            // $dest = pathinfo($path, PATHINFO_BASENAME);
+
+
+            $path_array = [];
+
+            foreach ($path as $p) {
+                $content = "http://127.0.0.1/storage/" . $p;
+                array_push($path_array, $content);
+                Log::debug("Getting file path. File:  " . $content) . ". Content: " .  intval($p);
+            }
+
+            $filename = "exported_". Carbon::now() .".pdf";
+
+            $content = str_replace("\\", "/", $content);
+
             return  [
-                'urls' => $filePaths,
-                'filename' => "pdf_name"
+                'urls' => $path_array,
+                'filename' => $filename
             ];
 
         } catch (\Exception $e) {

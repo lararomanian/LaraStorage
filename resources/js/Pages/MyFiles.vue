@@ -148,18 +148,19 @@ const selected = ref({});
 const loadMoreIntersect = ref(null)
 let search = ref('');
 
-const allFiles = ref({
-    data: props.files.data,
-    next: props.files.links.next
-})
-let params = null;
-
 // Props & Emit
 const props = defineProps({
     files: Object,
     folder: Object,
     ancestors: Object
 })
+
+const allFiles = ref({
+    data: props.files.data,
+    next: props.files.links.next
+})
+let params = null;
+
 
 // Computed
 const selectedIds = computed(() => Object.entries(selected.value).filter(a => a[1]).map(a => a[0]))

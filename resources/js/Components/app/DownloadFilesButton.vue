@@ -14,7 +14,7 @@
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
         </svg>
-        Export Pdf
+        Export Pdfs
     </PrimaryButton>
 </template>
 
@@ -95,21 +95,23 @@ function exportPDF() {
     httpPost(url, {
         ids: props.ids,
     }).then(res => {
-            console.log(res);
-            console.log('url', res.urls);
-            file_paths = res.urls;
+        console.log(res);
+
+        if (!res.urls) return;
+
+        for (let url of res.urls) {
+            const a = document.createElement('a');
+            a.download = res.filename;
+            a.href = url;
+            console.log(url, "url");
+            a.click();
+            a.remove();
+        }
+
     }).catch(async (er) => {
         console.log(er);
-            console.log(er.error ? er.error.message : 'An error occurred');
+        console.log(er.error ? er.error.message : 'An error occurred');
     })
-
-        const a = document.createElement('a');
-        a.download = "exported.pdf";
-        a.href = file_paths[0];
-        a.click();
-        a.remove();
-
-    console.log("exported pdfs", props.ids);
 }
 
 // Hooks

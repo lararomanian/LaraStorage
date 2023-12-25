@@ -47,6 +47,7 @@ Route::get('/getLatestEntry/{id}', 'getLatestEntry');
         Route::get('/file/download-shared-with-me', 'downloadSharedWithMe')->name('file.downloadSharedWithMe');
         Route::get('/file/download-shared-by-me', 'downloadSharedByMe')->name('file.downloadSharedByMe');
         Route::post('/file/update-ocr','updateOCR')->name('file.updateOCR');
+
     });
 
 Route::middleware('auth')->group(function () {
